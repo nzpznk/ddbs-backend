@@ -1,0 +1,26 @@
+{
+  "name": "ddbs-backend",
+  "version": "1.0.0",
+  "description": "koa backend for ddbs project",
+  "main": "app.js",
+  "dependencies": {
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nzpznk/ddbs-backend.git"
+  },
+  "keywords": [],
+  "author": "Zeping Niu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nzpznk/ddbs-backend/issues"
+  },
+  "homepage": "https://github.com/nzpznk/ddbs-backend#readme"
+}
