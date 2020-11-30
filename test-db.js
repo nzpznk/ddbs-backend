@@ -97,5 +97,7 @@ x3 = Read.find({readOrNot: '1'}, (err, res)=>{
 
 (async()=>{
 await Promise.all([x1, x2, x3]);
+let ttt = await User.find({uid: '35'});
+console.log(ttt);
 mongoose.disconnect();
 })();

@@ -3,6 +3,7 @@ const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const Router = require('koa-router');
 const mongoose = require('mongoose');
+const controllers = require('./controllers');
 
 // connect with mongodb
 mongoose.connect('mongodb://localhost/douban', { useNewUrlParser: true, useUnifiedTopology: true});
@@ -18,9 +19,8 @@ router = new Router();
 router.get('/', async (ctx, next) => {
     ctx.body=`exciting`
 });
-router.get('/user', async (ctx, next) => {
-    console.log(ctx.request);
-})
+router.get('/user', controllers.search_user_name);
+// router.get()
 
 app.use(router.routes())
 app.use(serve('./static'))
