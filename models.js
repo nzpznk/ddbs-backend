@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const redis = require('redis');
 const { promisify } = require('util');
 const { redis_conf } = require('./config');
+const { title } = require('process');
 
 const redis_client = redis.createClient(redis_conf);
 const client = {
@@ -14,11 +15,11 @@ const client = {
     hset: promisify(redis_client.hset).bind(redis_client)
 };
 
-async function cached_search_with_cond_and_key(key, cond, mongo_model, expire_time) {
+async function cached_search_with_cond_and_key(key, cond, proj, mongo_model, expire_time) {
     let res_dat = await client.get(key);
     if (res_dat === null) {
         console.log(key + ' not in cache');
-        res_dat = await mongo_model.find(cond).catch((err) => console.log(err));
+        res_dat = await mongo_model.find(cond, proj).lean().catch((err) => console.log(err));
         client.set(key, JSON.stringify(res_dat), 'EX', expire_time);
         return res_dat;
     } else {
@@ -41,28 +42,104 @@ class User {
     
     async get_by_id(id) {
         const key = this.name + '@id@' + id;
-        return await cached_search_with_cond_and_key(key, {'id': id}, this.mongo_model, this.expire_time);
+        const proj = {'_id': 0, 'uid': 0};
+        return await cached_search_with_cond_and_key(key, {'id': id}, proj, this.mongo_model, this.expire_time);
     }
 
     async get_by_name(name) {
         const key = this.name + '@name@' + name;
-        return await cached_search_with_cond_and_key(key, {'name': name}, this.mongo_model, this.expire_time);
+        const proj = {'_id': 0};
+        return await cached_search_with_cond_and_key(key, {'name': name}, proj, this.mongo_model, this.expire_time);
     }
 }
 
-// class Article {
+class Article {
+    constructor() {
+        this.mongo_model = mongoose.model('Article', articleSchema);
+        this.name = "article";
+        this.expire_time = get_random(60, 120);
+    }
+    async get_by_aid(aid) {
+        const key = this.name + '@aid@' + aid;
+        const proj = {};
+        return await cached_search_with_cond_and_key(key, {'aid': aid}, proj, this.mongo_model, this.expire_time);
+    }
+    async get_by_title() {
+        const key = this.name + '@title@' + title;
+        const proj = {};
+        return await cached_search_with_cond_and_key(key, {'title': title}, proj, this.mongo_model, this.expire_time);
+    }
+    async get_by_date_time() {}
+}
 
-// }
+/**
+ * cache data:
+ * read|userread|user_id: list of user read articles;
+ * // read|read|user_id|article_id: a read schema record;
+ */
+class Read {
+    constructor() {
+        this.mongo_model = mongoose.model('Read', readSchema);
+        this.name = 'read';
+        this.expire_time = get_random(20, 30);
+    }
+    async get_user_reads(user_id) {
+        const key = this.name + '@userread@' + user_id;
+        const cond = {'uid': user_id, 'readOrNot': 1};
+        const proj = {'_id': 0, 'timestamp': 1, 'aid': 1, 'readTimeLength': 1, 'readSequence': 1};
+        return await cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
+    }
+    // async get_read_record(user_id, article_id) {
+    //     const key = this.name + '@read@' + user_id + '@' + article_id;
+    //     const cond = {'uid': user_id, 'aid': article_id};
+    //     return await cached_search_with_cond_and_key(key, cond, {}, this.mongo_model, this.expire_time);
+    // }
+    // async insert_user_read(user_id, article_id) {
+    //     let read_record = await this.get_read_record(user_id, article_id);
+    //     if (read_record.length > 0) { // read record in cache, update read_time & read_or_not
+
+    //         await this.mongo_model.updateOne({_id: read_record[0]['_id']}, {'timestamp': Date.now(), 'readOrNot': 1});
+    //     } else {
+    //         read_record = new this.mongo_model({
+    //             uid: user_id,
+    //             aid: article_id, 
+    //             readOrNot: 1
+    //         });
+    //         await read_record.save();
+    //     }
+    //     return 'insert_user_read finished';
+    // }
+    // async get_user_shares(user_id) {
+    // }
+    // async get_user_comments(user_id, article_id) {
+    // }
+}
 
 
-(async ()=>{
-    mongoose.connect('mongodb://localhost/douban', { useNewUrlParser: true, useUnifiedTopology: true});
-    const db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'database connection error'));
-    db.once('open', () => { console.log('connection with database established.'); });
-    const umodel = new User();
-    console.log(await umodel.get_by_id('u35'));
-    console.log(await umodel.get_by_id('not in db'));
-    console.log(await umodel.get_by_name('user95'));
-    console.log(await umodel.get_by_name('u35'));
-})();
+// (async ()=>{
+//     mongoose.connect('mongodb://localhost/douban', { useNewUrlParser: true, useUnifiedTopology: true});
+//     const db = mongoose.connection;
+//     db.on('error', console.error.bind(console, 'database connection error'));
+//     db.once('open', () => { console.log('connection with database established.'); });
+//     const umodel = new User();
+//     const readmodel = new Read();
+//     console.log(await umodel.get_by_id('u35'));
+//     console.log(await umodel.get_by_id('not in db'));
+//     console.log(await umodel.get_by_name('user95'));
+//     console.log(await umodel.get_by_name('u35'));
+//     console.log(await readmodel.get_user_reads('35'));
+//     console.log(await readmodel.get_read_record('35', '6'));
+    
+//     try{
+//         // console.log(await readmodel.insert_user_read('35', '6'));
+//         // console.log(await readmodel.insert_user_read('35', '1'));
+//     } catch(err) {
+//         console.log(err);
+//     }
+// })();
+
+module.exports = {
+    User: new User(),
+    Article: new Article(), 
+    Read: new Read()
+}

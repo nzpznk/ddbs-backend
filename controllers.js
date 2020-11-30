@@ -1,18 +1,52 @@
-const { userSchema, articleSchema, readSchema, beReadSchema, rankSchema } = require('./schema')
-const mongoose = require('mongoose');
+const Router = require('koa-router');
+const {User, Article, Read} = require('./models');
 
-User = mongoose.model('User', userSchema);
-Article = mongoose.model('Article', articleSchema);
-Read = mongoose.model('Read', readSchema);
-BeRead = mongoose.model('BeRead', beReadSchema);
-Rank = mongoose.model('Rank', rankSchema);
+const router = new Router({prefix: '/api'});
+
+// given user id or name, return user data.
+router.post('/user', async (ctx, next) => {
+    const id = ctx.request.body.id;
+    if (id === undefined) {
+        const name = ctx.request.body.name;
+        if (name === undefined) {
+            ctx.body = []
+        } else {
+            let res = await User.get_by_name(name);
+            ctx.body = res;
+        }
+    } else {
+        ctx.body = await User.get_by_id(id);
+    }
+});
+
+// given user uid, return read article list.
+router.post('/readlist', async (ctx, next) => {
+    // get parameter: userid
+    const userid = ctx.request.body.userid;
+
+    // query Read table to get user read article id list;
+    aidlist = await Read.get_user_reads(userid);
+    if (aidlist.length == 0) {
+        ctx.body = []
+        return;
+    }
+
+    // async search article detail, then add detail to read record;
+    let tasklist = []
+    for (let x of aidlist) {
+        tasklist.push((async () => {
+            x['article'] = (await Article.get_by_aid(x.aid))[0];
+            return x;
+        })());
+    }
+    let res = await Promise.all(tasklist);
+    ctx.body = res;
+});
 
 // supported queries:
 /**
- * search user by id
- * search article by id
- * search article by title
- * search article by date-time
+ * search user by id/name
+ * search article by id/title/date-time
  * given userid, join with read table, article table, return articles read by user, sort by date(latest->earlist)
  * insert a read record when a user read an article
  * update a read record when a user agree/share/comment an article
@@ -20,37 +54,27 @@ Rank = mongoose.model('Rank', rankSchema);
  * search top-5 daily/weekly/monthly popular articles(by read?agree?share?comment?) using be-read table
  */
 
-function search_user_by_id(user_id) {
 
-}
+// function search_article_by_title(article_name) {
+// }
 
-function search_article_by_id(article_id) {
+// function search_article_by_date(date_st, date_ed) {
+// }
 
-}
-
-function search_article_by_title(article_name) {
-
-}
-
-function search_article_by_date(date_st, date_ed) {
-
-}
-
-function search_read_articles_of_user(user_id) {
-
-}
-
-function insert_read_record()
+// function insert_read_record() {
+// }
 
 
-module.exports = {
-    search_user_name : async (ctx, next) => {
-        condition = ctx.request.query;
-        if (condition === undefined) {
-            ctx.body = []
-        } else {
+// module.exports = {
+//     search_user_name : async (ctx, next) => {
+//         condition = ctx.request.query;
+//         if (condition === undefined) {
+//             ctx.body = []
+//         } else {
             
-            ctx.body
-        }
-    }
-}
+//             ctx.body
+//         }
+//     }
+// }
+
+module.exports = {router};

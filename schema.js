@@ -33,17 +33,17 @@ const articleSchema = new mongoose.Schema({
 }, {collection: 'article'});
 
 const readSchema = new mongoose.Schema({
-    id: String, 
-    timestamp: String, 
+    id: String,
+    timestamp: {type: String, default: Date.now()}, 
     uid: String, 
     aid: String, 
-    readTimeLength: String, 
-    readSequence: String, 
-    readOrNot: String, 
-    aggreeOrNot: String, 
-    commentOrNot: String, 
-    commentDetail: String, 
-    shareOrNot: String
+    readTimeLength: {type: String, default: 0}, 
+    readSequence: {type: String, default: 0}, 
+    readOrNot: {type: String, default: 0}, 
+    aggreeOrNot: {type: String, default: 0}, 
+    commentOrNot: {type: String, default: 0}, 
+    commentDetail: {type: String, default: ""}, 
+    shareOrNot: {type: String, default: 0}
 }, {collection: 'read'});
 
 const beReadSchema = new mongoose.Schema({
@@ -53,11 +53,11 @@ const beReadSchema = new mongoose.Schema({
     readNum: String, 
     readUidList: String, 
     commentNum: String, 
-    commentUidList: String, 
+    commentUidList: Array, 
     agreeNum: String, 
-    agreeUidList: String, 
+    agreeUidList: Array, 
     shareNum: String, 
-    shareUidList: String
+    shareUidList: Array
 });
 
 const rankSchema = new mongoose.Schema({
