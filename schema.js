@@ -58,13 +58,13 @@ const beReadSchema = new mongoose.Schema({
     agreeUidList: Array, 
     shareNum: String, 
     shareUidList: Array
-});
+}, {collection: 'beread'});
 
 const rankSchema = new mongoose.Schema({
     id: String, 
     timestamp: String, 
     temporalGranularity: String, 
     articleAidList: String
-});
+}, {collection: 'rank'});
 
 module.exports = {userSchema, articleSchema, readSchema, beReadSchema, rankSchema}
