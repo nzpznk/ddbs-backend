@@ -43,6 +43,8 @@ router.post('/readlist', async (ctx, next) => {
     ctx.body = res;
 });
 
+// router.post('/')
+
 // supported queries:
 /**
  * search user by id/name
