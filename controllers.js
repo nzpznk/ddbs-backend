@@ -1,7 +1,13 @@
 const Router = require('koa-router');
+const mime = require('mime-types');
+const fs = require('fs');
+const {hdfs_conf} = require()
 const {User, Article, Read} = require('./models');
-
 const router = new Router({prefix: '/api'});
+
+var WebHDFS = require('webhdfs');
+
+var hdfs = WebHDFS.createClient();
 
 // given user id or name, return user data.
 router.post('/user', async (ctx, next) => {
@@ -43,7 +49,24 @@ router.post('/readlist', async (ctx, next) => {
     ctx.body = res;
 });
 
-// router.post('/')
+router.get('/image/:filename', async(ctx, next) => {
+    const filename = ctx.params.filename;
+    const mat = filename.match(/image\_a(?<aid>[0-9]+)\_([0-9]+)\.jpg/);
+    if (mat == null) {
+        console.log('image: '+filename+' does not exist.');
+    }
+    const aid = mat.groups.aid;
+    const fpath = '/article/article'+aid+'/'+filename;
+    ctx.response.set('content-type', mime.lookup(filename));
+});
+
+router.get('/video/:filename', async(ctx, next) => {
+
+});
+
+router.post('/article/:aid', async(ctx, next) => {
+
+});
 
 // supported queries:
 /**

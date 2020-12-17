@@ -3,9 +3,10 @@ const bodyParser = require('koa-bodyparser');
 const serve = require('koa-static');
 const mongoose = require('mongoose');
 const { router } = require('./controllers');
+const { mongo_conf } = require('./config')
 
 // connect with mongodb
-mongoose.connect('mongodb://localhost/douban', { useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(mongo_conf['url'], { useNewUrlParser: true, useUnifiedTopology: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'database connection error'));
 db.once('open', () => { console.log('connection with database established.'); });
@@ -17,6 +18,6 @@ app.use(bodyParser())
 app.use(router.routes())
 app.use(serve('./static'))
 
-app.listen(3000, ()=>{
-    console.log('server is running at localhost:3000')
+app.listen(9933, ()=>{
+    console.log('server is running at localhost:9933')
 });

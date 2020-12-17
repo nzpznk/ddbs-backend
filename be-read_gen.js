@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { readSchema } = require('./schema');
 
-const conn_finish = mongoose.connect('mongodb://localhost/douban', { useNewUrlParser: true, useUnifiedTopology: true});
+const conn_finish = mongoose.connect('mongodb://rydell-router-01/db', { useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'database connection error'));
@@ -9,7 +9,7 @@ db.once('open', () => { console.log('connection with database established.'); })
 
 (async() => {
     await conn_finish;
-    const ReadModel = mongoose.model('BeRead', readSchema);
+    const ReadModel = mongoose.model('Read', readSchema);
     const pipeline = [
         {
             $group: {
@@ -28,12 +28,12 @@ db.once('open', () => { console.log('connection with database established.'); })
         },
         { $unset: '_id' },
         { $merge: {
-            into: 'beread',
+            into: 'be-read',
             on: ['category', 'aid'],
-            whenMatched: replace,
-            whenNotMatched: insert
+            whenMatched: 'replace',
+            whenNotMatched: 'insert'
         } }
     ]
-    ReadModel.aggregate(pipeline);
+    await ReadModel.aggregate(pipeline);
     await mongoose.disconnect();
 })();

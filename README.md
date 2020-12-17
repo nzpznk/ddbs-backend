@@ -55,6 +55,7 @@ NETWORK ID          NAME                    DRIVER              SCOPE
 - copy files to name node of hadoop
 - at name node 
     ```hadoop fs -put <local_data_folder> <HDFS directory>```
+    ```hadoop fs -put articles /articles```
 
 
 ## server app(using koa) docker
@@ -64,3 +65,25 @@ added to the network of hdfs using ```--network=docker-hadoop_default```. the se
 restful api.
 
 ```docker run -itd --network=docker-hadoop_default --name=server0 -p 127.0.0.1:9933:9933 node:14.15```
+
+in order to connect server with redis, we need:
+```docker network connect docker-hadoop_default myredis```
+
+## sharded-database docker reference:
+
+https://dzone.com/articles/composing-a-sharded-mongodb-on-docker
+
+## mongodb cluster docker
+
+- docker run -itd --network=mongo_network --name=shard1 mongo:latest
+- docker run -itd --network=mongo_network --name=shard2 mongo:latest
+- docker run -itd --network=mongo_network --name=confsvr mongo:latest
+- docker run -itd --network=mongo_network --name=router mongo:latest
+
+### confsvr
+
+### router
+
+### shard1
+
+### shard2

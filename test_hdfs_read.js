@@ -8,7 +8,7 @@ var hdfs = WebHDFS.createClient({
 	  path: '/webhdfs/v1'
 });
 
-var remoteFileStream = hdfs.createReadStream('/root/test_folder/hello1.txt');
+var remoteFileStream = hdfs.createReadStream('/articles/article0/text_a0.txt');
 
 var x = remoteFileStream.on('data', function(chunck) {
 	var dat = chunck.toString();

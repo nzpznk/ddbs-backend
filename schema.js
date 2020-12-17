@@ -50,6 +50,7 @@ const beReadSchema = new mongoose.Schema({
     id: String, 
     timestamp: String, 
     aid: String, 
+    category: String, 
     readNum: String, 
     readUidList: String, 
     commentNum: String, 
@@ -58,7 +59,7 @@ const beReadSchema = new mongoose.Schema({
     agreeUidList: Array, 
     shareNum: String, 
     shareUidList: Array
-}, {collection: 'beread'});
+}, {collection: 'be-read'});
 
 const rankSchema = new mongoose.Schema({
     id: String, 
