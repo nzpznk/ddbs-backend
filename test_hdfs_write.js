@@ -14,7 +14,7 @@ var remoteFileStream = hdfs.createWriteStream('/root/nzp_test_create_file.txt');
 localFileStream.pipe(remoteFileStream);
 
 remoteFileStream.on('error', function onError (err) {
-	  // Do something with the error
+	// Do something with the error
 	console.log('error occurred');
 });
 
