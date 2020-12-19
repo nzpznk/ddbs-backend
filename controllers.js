@@ -30,7 +30,7 @@ router.post('/readlist', async (ctx, next) => {
     const userid = ctx.request.body.userid;
 
     // query Read table to get user read article id list;
-    aidlist = await Read.get_user_reads(userid);
+    let aidlist = await Read.get_user_reads(userid);
     if (aidlist.length == 0) {
         ctx.body = []
         return;
@@ -46,6 +46,11 @@ router.post('/readlist', async (ctx, next) => {
     }
     let res = await Promise.all(tasklist);
     ctx.body = res;
+});
+
+router.post('/article', async(ctx, next) => {
+    const aid = ctx.request.body.aid;
+    ctx.body = (await Article.get_by_aid(aid))[0];
 });
 
 router.get('/image/:filename', async(ctx, next) => {
@@ -84,7 +89,7 @@ router.get('/video/:filename', async(ctx, next) => {
     ctx.body = videosrc;
 });
 
-router.get('/article/:aid', async (ctx, next) => {
+router.get('/text/:aid', async (ctx, next) => {
     console.log('text getting...');
     const instr = ctx.params.aid;
     const mat = instr.match(/(?<aid>[0-9]+)/);
@@ -102,7 +107,6 @@ router.get('/article/:aid', async (ctx, next) => {
             });
             textsrc.on('data', (chunk) => {
                 let dat = chunk.toString();
-                console.log(dat);
                 console.log('text get finished');
                 resolve(dat);
             });

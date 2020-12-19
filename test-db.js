@@ -98,6 +98,7 @@ x2 = Article.find({aid:'24'}, (err, res) => {
 (async()=>{
 // await Promise.all([x1, x2, x3]);
 await x2;
+console.log(x2);
 let ttt = await User.find({uid: '35'}, { name: 1});
 console.log(ttt);
 mongoose.disconnect();
