@@ -74,6 +74,15 @@ class Article {
         return await cached_search_with_cond_and_key(key, {'title': title}, proj, this.mongo_model, this.expire_time);
     }
     async get_by_date_time() {}
+    async get_random_aidlist(num) {
+        return (await this.mongo_model.aggregate([
+            { $sample: {size: num} }, 
+            { $project: {aid: 1} }, 
+            { $group: {_id:'randomly', articleAidList: {$push: '$aid'}} },
+            { $set: {temporalGranularity: 'randomly'} },
+            { $project: {_id: 0} }
+        ]))[0];
+    }
 }
 
 /**

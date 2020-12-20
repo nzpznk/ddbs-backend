@@ -115,16 +115,23 @@ router.get('/text/:aid', async (ctx, next) => {
     }
 });
 
+router.post('/beread', async (ctx, next) => {
+    const aid = ctx.request.body.aid;
+    ctx.body = (await BeRead.get_article_stats(aid))[0];
+});
+
 router.post('/top5', async (ctx, next) => {
-    const today = ctx.request.body.today;
     const period = ctx.request.body.period;
-    console.log('getting top5:', period, ' today:', today);
     const gSet = new Set(['daily', 'weekly', 'monthly']);
-    if (!gSet.has(period)) {
-        console.log('/top5 get parameter: period', period);
-        ctx.response.status = 400;
-    } else {
+    if (gSet.has(period)) {
+        console.log('/top5 getting top5:', period);
         ctx.body = (await Rank.get_rank_by_granularity(period))[0];
+    } else if (period == 'randomly') {
+        console.log('/top5 randomly called');
+        ctx.body = await Article.get_random_aidlist(20);
+    } else {
+        console.log('/top5 errorget parameter: period', period);
+        ctx.response.status = 400;
     }
 });
 
@@ -138,28 +145,5 @@ router.post('/top5', async (ctx, next) => {
  * insert(when not exist)/update(when exist) a be-read record(of an article), when user read/share/comment/agree an article
  * search top-5 daily/weekly/monthly popular articles(by read?agree?share?comment?) using be-read table
  */
-
-
-// function search_article_by_title(article_name) {
-// }
-
-// function search_article_by_date(date_st, date_ed) {
-// }
-
-// function insert_read_record() {
-// }
-
-
-// module.exports = {
-//     search_user_name : async (ctx, next) => {
-//         condition = ctx.request.query;
-//         if (condition === undefined) {
-//             ctx.body = []
-//         } else {
-            
-//             ctx.body
-//         }
-//     }
-// }
 
 module.exports = {router};
