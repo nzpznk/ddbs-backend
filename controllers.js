@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const mime = require('mime-types');
 const {hdfs_conf} = require('./config');
-const {User, Article, Read} = require('./models');
+const {User, Article, Read, BeRead, Rank} = require('./models');
 const router = new Router({prefix: '/api'});
 
 var WebHDFS = require('webhdfs');
@@ -112,6 +112,21 @@ router.get('/text/:aid', async (ctx, next) => {
             });
         });
         ctx.body = dat;
+    }
+});
+
+router.post('/top5', async (ctx, next) => {
+    const today = ctx.request.body.today;
+    const period = ctx.request.body.period;
+    console.log('getting top5:', period, ' today:', today);
+    if (period == 'daily') {
+
+    } else if (period == 'weekly') {
+
+    } else if (period == 'monthly') {
+
+    } else {
+
     }
 });
 

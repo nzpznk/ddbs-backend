@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const { readSchema } = require('./schema');
+const { mongo_conf } = require('./config')
 
-const conn_finish = mongoose.connect('mongodb://rydell-router-01/db', { useNewUrlParser: true, useUnifiedTopology: true});
+const conn_finish = mongoose.connect(mongo_conf.url, { useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'database connection error'));

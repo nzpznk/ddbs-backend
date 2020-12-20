@@ -115,31 +115,38 @@ class Read {
     // }
 }
 
+class BeRead {
+    constructor() {
+        this.mongo_model = mongoose.model('BeRead', beReadSchema);
+        this.name = 'beread';
+        this.expire_time = get_random(60, 120);
+    }
+    async get_article_stats(aid) {
+        const key = this.name + "@articlestat@" + aid;
+        const cond = {aid: aid};
+        const proj = {};
+        return await cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
+    }
+}
 
-// (async ()=>{
-//     mongoose.connect('mongodb://localhost/douban', { useNewUrlParser: true, useUnifiedTopology: true});
-//     const db = mongoose.connection;
-//     db.on('error', console.error.bind(console, 'database connection error'));
-//     db.once('open', () => { console.log('connection with database established.'); });
-//     const umodel = new User();
-//     const readmodel = new Read();
-//     console.log(await umodel.get_by_id('u35'));
-//     console.log(await umodel.get_by_id('not in db'));
-//     console.log(await umodel.get_by_name('user95'));
-//     console.log(await umodel.get_by_name('u35'));
-//     console.log(await readmodel.get_user_reads('35'));
-//     console.log(await readmodel.get_read_record('35', '6'));
-    
-//     try{
-//         // console.log(await readmodel.insert_user_read('35', '6'));
-//         // console.log(await readmodel.insert_user_read('35', '1'));
-//     } catch(err) {
-//         console.log(err);
-//     }
-// })();
+class Rank {
+    constructor() {
+        this.mongo_model = mongoose.model('Rank', rankSchema);
+        this.name = 'rank';
+        this.expire_time = get_random(60, 120);
+    }
+    async get_rank_by_granularity(granularity) {
+        const key = this.name + '@rank@' + granularity;
+        const cond = { temporalGranularity: granularity };
+        const proj = { _id: 0, timestamp: 0, shardTag: 0 };
+        return cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
+    }
+}
 
 module.exports = {
     User: new User(),
     Article: new Article(), 
-    Read: new Read()
+    Read: new Read(), 
+    BeRead: new BeRead(), 
+    Rank: new Rank()
 }
