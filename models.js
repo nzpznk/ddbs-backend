@@ -43,12 +43,14 @@ class User {
     async get_by_id(id) {
         const key = this.name + '@id@' + id;
         const proj = {'_id': 0, 'uid': 0};
+        this.expire_time = get_random(30, 60);
         return await cached_search_with_cond_and_key(key, {'id': id}, proj, this.mongo_model, this.expire_time);
     }
 
     async get_by_name(name) {
         const key = this.name + '@name@' + name;
         const proj = {'_id': 0};
+        this.expire_time = get_random(30, 60);
         return await cached_search_with_cond_and_key(key, {'name': name}, proj, this.mongo_model, this.expire_time);
     }
 }
@@ -62,11 +64,13 @@ class Article {
     async get_by_aid(aid) {
         const key = this.name + '@aid@' + aid;
         const proj = {};
+        this.expire_time = get_random(60, 120);
         return await cached_search_with_cond_and_key(key, {'aid': aid}, proj, this.mongo_model, this.expire_time);
     }
     async get_by_title() {
         const key = this.name + '@title@' + title;
         const proj = {};
+        this.expire_time = get_random(60, 120);
         return await cached_search_with_cond_and_key(key, {'title': title}, proj, this.mongo_model, this.expire_time);
     }
     async get_by_date_time() {}
@@ -87,6 +91,7 @@ class Read {
         const key = this.name + '@userread@' + user_id;
         const cond = {'uid': user_id, 'readOrNot': 1};
         const proj = {'_id': 0, 'timestamp': 1, 'aid': 1, 'readTimeLength': 1, 'readSequence': 1};
+        this.expire_time = get_random(20, 30);
         return await cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
     }
     // async get_read_record(user_id, article_id) {
@@ -125,6 +130,7 @@ class BeRead {
         const key = this.name + "@articlestat@" + aid;
         const cond = {aid: aid};
         const proj = {};
+        this.expire_time = get_random(60, 120);
         return await cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
     }
 }
@@ -136,9 +142,10 @@ class Rank {
         this.expire_time = get_random(60, 120);
     }
     async get_rank_by_granularity(granularity) {
-        const key = this.name + '@rank@' + granularity;
+        const key = this.name + '@granularity@' + granularity;
         const cond = { temporalGranularity: granularity };
-        const proj = { _id: 0, timestamp: 0, shardTag: 0 };
+        const proj = { _id: 0, shardTag: 0 };
+        this.expire_time = get_random(60, 120);
         return cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
     }
 }

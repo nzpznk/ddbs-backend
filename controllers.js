@@ -119,14 +119,12 @@ router.post('/top5', async (ctx, next) => {
     const today = ctx.request.body.today;
     const period = ctx.request.body.period;
     console.log('getting top5:', period, ' today:', today);
-    if (period == 'daily') {
-
-    } else if (period == 'weekly') {
-
-    } else if (period == 'monthly') {
-
+    const gSet = new Set(['daily', 'weekly', 'monthly']);
+    if (!gSet.has(period)) {
+        console.log('/top5 get parameter: period', period);
+        ctx.response.status = 400;
     } else {
-
+        ctx.body = (await Rank.get_rank_by_granularity(period))[0];
     }
 });
 
