@@ -16,7 +16,7 @@ const app = new Koa();
 app.use(bodyParser())
 
 app.use(router.routes())
-app.use(serve('./static'))
+app.use(serve('./dist'))
 
 app.listen(9933, ()=>{
     console.log('server is running at localhost:9933')
