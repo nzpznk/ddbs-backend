@@ -40,11 +40,11 @@ class User {
         this.expire_time = get_random(30, 60);
     }
     
-    async get_by_id(id) {
-        const key = this.name + '@id@' + id;
-        const proj = {'_id': 0, 'uid': 0};
+    async get_by_uid(uid) {
+        const key = this.name + '@uid@' + uid;
+        const proj = {'_id': 0};
         this.expire_time = get_random(30, 60);
-        return await cached_search_with_cond_and_key(key, {'id': id}, proj, this.mongo_model, this.expire_time);
+        return (await cached_search_with_cond_and_key(key, {'uid': uid}, proj, this.mongo_model, this.expire_time))[0];
     }
 
     async get_by_name(name) {

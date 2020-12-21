@@ -10,8 +10,8 @@ var hdfs = WebHDFS.createClient(hdfs_conf);
 
 // given user id or name, return user data.
 router.post('/user', async (ctx, next) => {
-    const id = ctx.request.body.id;
-    if (id === undefined) {
+    const uid = ctx.request.body.uid;
+    if (uid === undefined) {
         const name = ctx.request.body.name;
         if (name === undefined) {
             ctx.body = []
@@ -20,7 +20,7 @@ router.post('/user', async (ctx, next) => {
             ctx.body = res;
         }
     } else {
-        ctx.body = await User.get_by_id(id);
+        ctx.body = await User.get_by_uid(uid);
     }
 });
 
