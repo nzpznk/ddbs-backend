@@ -26,26 +26,27 @@ router.post('/user', async (ctx, next) => {
 
 // given user uid, return read article list.
 router.post('/readlist', async (ctx, next) => {
-    // get parameter: userid
-    const userid = ctx.request.body.userid;
+    // get parameter: uid
+    const uid = ctx.request.body.uid;
+    ctx.body = await Read.get_user_reads(uid);
 
     // query Read table to get user read article id list;
-    let aidlist = await Read.get_user_reads(userid);
-    if (aidlist.length == 0) {
-        ctx.body = []
-        return;
-    }
+    // let aidlist = await Read.get_user_reads(userid);
+    // if (aidlist.length == 0) {
+    //     ctx.body = []
+    //     return;
+    // }
 
-    // async search article detail, then add detail to read record;
-    let tasklist = []
-    for (let x of aidlist) {
-        tasklist.push((async () => {
-            x['article'] = (await Article.get_by_aid(x.aid))[0];
-            return x;
-        })());
-    }
-    let res = await Promise.all(tasklist);
-    ctx.body = res;
+    // // async search article detail, then add detail to read record;
+    // let tasklist = []
+    // for (let x of aidlist) {
+    //     tasklist.push((async () => {
+    //         x['article'] = (await Article.get_by_aid(x.aid))[0];
+    //         return x;
+    //     })());
+    // }
+    // let res = await Promise.all(tasklist);
+    // ctx.body = res;
 });
 
 router.post('/article', async(ctx, next) => {

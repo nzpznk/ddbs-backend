@@ -94,14 +94,19 @@ class Read {
     constructor() {
         this.mongo_model = mongoose.model('Read', readSchema);
         this.name = 'read';
-        this.expire_time = get_random(20, 30);
+        this.expire_time = get_random(120, 180);
     }
     async get_user_reads(user_id) {
-        const key = this.name + '@userread@' + user_id;
-        const cond = {'uid': user_id, 'readOrNot': 1};
-        const proj = {'_id': 0, 'timestamp': 1, 'aid': 1, 'readTimeLength': 1, 'readSequence': 1};
-        this.expire_time = get_random(20, 30);
-        return await cached_search_with_cond_and_key(key, cond, proj, this.mongo_model, this.expire_time);
+        return (await this.mongo_model.aggregate([
+            { $match: {uid: user_id} },
+            { $group: {
+                _id: user_id,
+                readlist: { $addToSet: { $cond: [{$eq: ['$readOrNot','1']}, '$aid', '$noval'] } },
+                commentlist: { $addToSet: { $cond: [{$eq: ['$commentOrNot','1']}, '$aid', '$noval'] } },
+                sharelist: { $addToSet: { $cond: [{$eq: ['$shareOrNot','1']}, '$aid', '$noval'] } },
+                agreelist: { $addToSet: { $cond: [{$eq: ['$agreeOrNot','1']}, '$aid', '$noval'] } }
+            } }
+        ]))[0];
     }
     // async get_read_record(user_id, article_id) {
     //     const key = this.name + '@read@' + user_id + '@' + article_id;
